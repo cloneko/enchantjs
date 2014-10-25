@@ -100,6 +100,7 @@ window.onload = function() {
 
     player = new Player();
     new Info();
+    new Life();
     game.time = game.fps * game.time;
     game.rootScene.addEventListener('touchmove', function(move){
       player.y = move.localY -50;
@@ -119,7 +120,7 @@ window.onload = function() {
       if (game.life == 0){game.pushScene(new EndingScene());}
       if (game.time == 0){game.pushScene(new EndingScene());}
     });
-    setLifes();
+
   }
   game.start();
 }
@@ -173,7 +174,6 @@ var Bomb = Class.create(Item,{
   onenterframe:function(){
     if(this.intersect(player)){
         game.life --;
-        life.width = 16 * game.life;
         this.remove();
     }
     this.move();
@@ -183,11 +183,15 @@ var Bomb = Class.create(Item,{
 function rand(num){
   return Math.floor(Math.random() * num);
 }
-function setLifes(){
-  life = new Sprite(16 * game.life,16);
-  life.image = game.assets['http://jsrun.it/assets/e/B/C/G/eBCGr.gif'];
-  life.set = function(num){
-    game.life = num;
-    this.width = 16 * 3;}
-    game.rootScene.addChild(life);
+
+var Life = Class.create(Sprite,{
+  initialize:function(){
+    Sprite.call(this,game.life * 16,16);
+    this.image = 
+      game.assets['http://jsrun.it/assets/e/B/C/G/eBCGr.gif'];
+    game.rootScene.addChild(this);
+  },
+  onenterframe:function(){
+    this.width = game.life * 16;
   }
+});
