@@ -57,6 +57,30 @@ var Player = Class.create(Sprite,{
     this.y = 200;
     this.frame = 0;
     game.rootScene.addChild(this);
+  },
+  onenterframe:function(){
+    if(game.frame % 4 == 0){ 
+      this.frame = game.frame % 3;
+    }
+  }
+});
+
+var Info = Class.create(Label,{
+  initialize:function(){
+    Label.call(this);
+    this.x = 0;
+    this.y = 17;
+    game.rootScene.addChild(this);
+  },
+  onenterframe:function(){
+    if(game.frame % 10 === 0){
+      this.text = [
+        "スコア"
+        , game.score 
+        , "<br>残り時間"
+        , Math.floor(game.time / game.fps) + "秒"
+      ].join("");
+    }
   }
 });
 
@@ -68,17 +92,14 @@ window.onload = function() {
   game.score = SCORE;
   var label;
   game.preload(['http://jsrun.it/assets/k/r/t/X/krtXz.gif',
-                'http://jsrun.it/assets/v/1/a/l/v1alF.gif',
-                'http://jsrun.it/assets/e/B/C/G/eBCGr.gif',
-                'http://enchantjs.com/assets/images/bg/bg02.jpg']);
+    'http://jsrun.it/assets/v/1/a/l/v1alF.gif',
+    'http://jsrun.it/assets/e/B/C/G/eBCGr.gif',
+    'http://enchantjs.com/assets/images/bg/bg02.jpg']);
 
   game.onload = function() {    
 
     player = new Player();
-    label = new Label("");
-    label.x =0;
-    label.y =17;
-    game.rootScene.addChild(label);
+    new Info();
     game.time = game.fps * game.time;
     game.rootScene.addEventListener('touchmove', function(move){
       player.y = move.localY -50;
@@ -86,14 +107,14 @@ window.onload = function() {
     });
     count = 0;
     game.rootScene.addEventListener('enterframe',function(){
-      if(game.frame % 4 == 0){ player.frame = game.frame % 3;}
+      
       if(game.frame % 10 == 0){
         if (game.frame % 3 == 0) {additem(14);}
         else if (game.frame % 7 == 0) {additem(30);}
         else{additem(24);}
-        label.text = "スコア" + game.score + "<br>残り時間" + Math.floor(game.time / game.fps) +"秒";
+        
       }
-      game.time --;
+      console.log(game.time--);
       game.frameCount ++;
       if (game.life == 0){game.pushScene(new EndingScene());}
       if (game.time == 0){game.pushScene(new EndingScene());}
@@ -123,7 +144,7 @@ function additem(item_frame){
         game.rootScene.removeChild(this);
         game.life --;
         life.width = 16 * game.life;}
-    }else{this.y += 2;}});
+      }else{this.y += 2;}});
   count++;
   game.rootScene.addChild(item);
 }
@@ -136,5 +157,5 @@ function setLifes(){
   life.set = function(num){
     game.life = num;
     this.width = 16 * 3;}
-  game.rootScene.addChild(life);
-}
+    game.rootScene.addChild(life);
+  }
