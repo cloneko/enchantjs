@@ -38,8 +38,6 @@ var Item = Class.create(Sprite,{
     function rand(num){
       return Math.floor(Math.random() * num);
     }
-}
-
   }, 
   // アイテムの移動
   move:function () {
