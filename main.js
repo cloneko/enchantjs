@@ -90,7 +90,7 @@ window.onload = function() {
   game.life = LIFE;
   game.time  = TIME;
   game.score = SCORE;
-  var label;
+
   game.preload(['http://jsrun.it/assets/k/r/t/X/krtXz.gif',
     'http://jsrun.it/assets/v/1/a/l/v1alF.gif',
     'http://jsrun.it/assets/e/B/C/G/eBCGr.gif',
@@ -105,17 +105,17 @@ window.onload = function() {
       player.y = move.localY -50;
       player.x = move.localX -20;
     });
-    count = 0;
+//    count = 0;
     game.rootScene.addEventListener('enterframe',function(){
       
       if(game.frame % 10 == 0){
-        if (game.frame % 3 == 0) {additem(14);}
-        else if (game.frame % 7 == 0) {additem(30);}
-        else{additem(24);}
+        if (game.frame % 3 == 0) {new Coin();}
+        else if (game.frame % 7 == 0) {new Star();}
+        else{new Bomb();}
         
       }
-      console.log(game.time--);
-      game.frameCount ++;
+      game.time--;
+//      game.frameCount ++;
       if (game.life == 0){game.pushScene(new EndingScene());}
       if (game.time == 0){game.pushScene(new EndingScene());}
     });
@@ -124,30 +124,62 @@ window.onload = function() {
   game.start();
 }
 
-function additem(item_frame){
-  var item = new Sprite(16, 16);
-  item.image = game.assets['http://jsrun.it/assets/v/1/a/l/v1alF.gif'];
-  item.x = rand(304);
-  item.y = 0;
-  item.frame = item_frame;
-  item.addEventListener('enterframe', function() {
+var Item = Class.create(Sprite,{
+  initialize:function(){
+    Sprite.call(this,16,16);
+    this.image = game.assets['http://jsrun.it/assets/v/1/a/l/v1alF.gif'];
+    this.x = rand(gsettings.width - this.width);
+    this.y = 0;
+    this.score = 0;
+    this.speed = 2;
+    game.rootScene.addChild(this);
+  },
+  move:function (){
+    this.y += this.speed;
+  },
+  remove:function() {
+    game.rootScene.removeChild(this);
+  },
+  onenterframe:function(){
     if(this.intersect(player)){
-      if (item.frame == 14) {
-        game.rootScene.removeChild(this);
-        game.score +=  10;
-      }
-      else if (item.frame == 30) {
-        game.rootScene.removeChild(this);
-        game.score +=  50;
-      }
-      else if (item.frame == 24){
-        game.rootScene.removeChild(this);
+      game.score += this.score;
+      this.remove();
+    }
+    this.move();
+  }
+});
+
+var Coin = Class.create(Item,{
+  initialize:function(){
+    Item.call(this);
+    this.frame = 14;
+    this.score = 10;
+  }
+});
+
+var Star = Class.create(Item,{
+  initialize:function(){
+    Item.call(this);
+    this.frame = 30;
+    this.score = 50;
+  }
+});
+
+var Bomb = Class.create(Item,{
+  initialize:function(){
+    Item.call(this);
+    this.frame = 24;
+  },
+  onenterframe:function(){
+    if(this.intersect(player)){
         game.life --;
-        life.width = 16 * game.life;}
-      }else{this.y += 2;}});
-  count++;
-  game.rootScene.addChild(item);
-}
+        life.width = 16 * game.life;
+        this.remove();
+    }
+    this.move();
+  }
+});
+
 function rand(num){
   return Math.floor(Math.random() * num);
 }
