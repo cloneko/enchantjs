@@ -6,7 +6,7 @@ var gsettings = {
   fps:20
 };
 
-var game ;
+var game,player;
 var SCORE = 0;
 var TIME = 30;
 var LIFE = 5;
@@ -43,9 +43,20 @@ var EndingScene = Class.create(Scene,{
   score:function(){
     var text = game.score.toString();
     var x = 0;
-    var y = (game.height / 2) ;
+    var y = (game.height / 2);
     var color = 'green';
     return new BaseLabel(text,x,y,color);
+  }
+});
+
+var Player = Class.create(Sprite,{
+  initialize:function(){
+    Sprite.call(this,32,32);
+    this.image = game.assets['http://jsrun.it/assets/k/r/t/X/krtXz.gif'];
+    this.x = 160;
+    this.y = 200;
+    this.frame = 0;
+    game.rootScene.addChild(this);
   }
 });
 
@@ -60,27 +71,22 @@ window.onload = function() {
                 'http://jsrun.it/assets/v/1/a/l/v1alF.gif',
                 'http://jsrun.it/assets/e/B/C/G/eBCGr.gif',
                 'http://enchantjs.com/assets/images/bg/bg02.jpg']);
+
   game.onload = function() {    
 
-
-    bear = new Sprite(32, 32);
-    bear.image = game.assets['http://jsrun.it/assets/k/r/t/X/krtXz.gif'];
-    bear.x = 160;
-    bear.y = 200;
-    bear.frame = 0;
-    game.rootScene.addChild(bear);
+    player = new Player();
     label = new Label("");
     label.x =0;
     label.y =17;
     game.rootScene.addChild(label);
     game.time = game.fps * game.time;
     game.rootScene.addEventListener('touchmove', function(move){
-      bear.y = move.localY -50;
-      bear.x = move.localX -20;
+      player.y = move.localY -50;
+      player.x = move.localX -20;
     });
     count = 0;
     game.rootScene.addEventListener('enterframe',function(){
-      if(game.frame % 4 == 0){ bear.frame = game.frame % 3;}
+      if(game.frame % 4 == 0){ player.frame = game.frame % 3;}
       if(game.frame % 10 == 0){
         if (game.frame % 3 == 0) {additem(14);}
         else if (game.frame % 7 == 0) {additem(30);}
@@ -104,7 +110,7 @@ function additem(item_frame){
   item.y = 0;
   item.frame = item_frame;
   item.addEventListener('enterframe', function() {
-    if(this.intersect(bear)){
+    if(this.intersect(player)){
       if (item.frame == 14) {
         game.rootScene.removeChild(this);
         game.score +=  10;
