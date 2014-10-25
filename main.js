@@ -6,9 +6,48 @@ var gsettings = {
   fps:20
 };
 
-var SCORE = 000;
+var game ;
+var SCORE = 0;
 var TIME = 30;
 var LIFE = 5;
+
+var BaseLabel = Class.create(Label,{
+  initialize:function(text,x,y,color){
+    Label.call(this,text);
+    this.textAlign = "center";
+    this.font = "100px monospace";
+    this.x = x || 0;
+    this.y = y || 0;
+    this.color = color || 'black';
+  }
+});
+
+var EndingScene = Class.create(Scene,{
+  initialize:function(){
+    Scene.call(this);
+    this.addChild(this.background());
+    this.addChild(this.title());
+    this.addChild(this.score());
+  },
+  background:function(){
+    var background = new Sprite(320, 320);
+    background.image = game.assets['http://enchantjs.com/assets/images/bg/bg02.jpg'];
+    return background;
+  },
+  title:function(){
+    var text = "SCORE";
+    var x = 0;
+    var y = (game.height / 2) - 90;
+    return new BaseLabel(text,x,y);
+  },
+  score:function(){
+    var text = game.score.toString();
+    var x = 0;
+    var y = (game.height / 2) ;
+    var color = 'green';
+    return new BaseLabel(text,x,y,color);
+  }
+});
 
 window.onload = function() {
   game = new Game(gsettings.width, gsettings.height);
@@ -23,26 +62,6 @@ window.onload = function() {
                 'http://enchantjs.com/assets/images/bg/bg02.jpg']);
   game.onload = function() {    
 
-  game.makeScene_finish = function() {
-    var finish_Scene = new Scene();
-    var text = new Label();
-    text.text = "SCORE";
-    text.textAlign = "center";
-    text.y = (game.height / 2) - 90;
-    text.font = "100px monospace";
-    var score = new Label();
-    score.text = game.score;
-    score.color = "green";
-    score.y = game.height / 2;
-    score.textAlign = "center";
-    score.font = "100px monospace";
-    var bg = new Sprite(320, 320);
-    bg.image = game.assets['http://enchantjs.com/assets/images/bg/bg02.jpg'];
-    finish_Scene.addChild(bg);
-    finish_Scene.addChild(text);
-    finish_Scene.addChild(score);
-    return finish_Scene;
-  }; 
 
     bear = new Sprite(32, 32);
     bear.image = game.assets['http://jsrun.it/assets/k/r/t/X/krtXz.gif'];
@@ -70,8 +89,9 @@ window.onload = function() {
       }
       game.time --;
       game.frameCount ++;
-      if (game.life == 0){game.pushScene(game.makeScene_finish());}
-      if (game.time == 0){game.pushScene(game.makeScene_finish());}});
+      if (game.life == 0){game.pushScene(new EndingScene());}
+      if (game.time == 0){game.pushScene(new EndingScene());}
+    });
     setLifes();
   }
   game.start();
